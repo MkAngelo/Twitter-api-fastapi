@@ -37,7 +37,16 @@ class User(UserBase):
 
 
 class Tweet(BaseModel):
-    pass
+    tweet_id: UUID = Field(...)
+    content: str = Field(
+        ...,
+        min_length=1,
+        max_length=256
+    )
+    created_at: datetime = Field(default=datetime.now())
+    update_at: Optional[datetime] = Field(default=None)
+    by: User = Field
+
 
 @app.get(path="/")
 def home():
