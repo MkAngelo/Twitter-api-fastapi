@@ -96,7 +96,7 @@ def signup(user: UserRegister = Body(...)):
 ### Login a User
 @app.post(
     path="/login",
-    response_model=User,
+    response_model=List[Tweet],
     status_code=status.HTTP_200_OK,
     summary="Login a User",
     tags=["Users"]
@@ -115,14 +115,15 @@ def login(user: UserLogin = Body(...)):
     Returns to twitter's home
     """
     user_dict = user.dict()
-
+    with open("tweets.json", "r", encoding="utf-8") as h:
+        home = json.loads(h.read())
     with open("users.json", "r", encoding="utf-8") as f:
         users = json.loads(f.read())
 
         for person in users:
             if person["email"] == user_dict["email"]:
                 if person["password"] == user_dict["password"]:
-                    return person
+                    return home
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Wrong email or password"
@@ -156,15 +157,38 @@ def show_all_users():
         return results
 
 ### Show a User
-@app.get(
+@app.post(
     path="/users/{user_id}",
     response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Show a User",
     tags=["Users"]
 )
-def show_a_user():
-    pass
+def show_a_user(user: UserBase = Body(...)):
+    """
+    Show a User
+
+    This path operations returns the user information
+
+    Parameters:
+    - Request body parameters:
+        - email: Emailstr
+    
+    Returns information about the user
+    """
+    user_dict = user.dict()
+    
+    with open("users.json", "r", encoding="utf-8") as f:
+        users = json.loads(f.read())
+
+        for us in users:
+            if us["email"] == user_dict["email"]:
+                return us
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="This user not exists"
+        )
 
 ### Delete a User
 @app.delete(
