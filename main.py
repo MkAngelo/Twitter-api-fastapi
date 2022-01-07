@@ -377,8 +377,34 @@ def show_a_tweet(id: UUID):
     summary="Delete a Tweet",
     tags=["Tweets"]
 )
-def delete_a_tweet():
-    pass
+def delete_a_tweet(id: UUID):
+    """
+    Delete a Tweet
+
+    This path operation delete a tweet using his id
+
+    **Parameters**
+    - Resquest body parameters:
+        - id: UUID
+
+    Returns information about the deleted tweet
+    """
+    id = str(id)
+    with open("tweets.json", "r", encoding="utf-8") as f:
+        tweets_dict = json.loads(f.read())
+        
+        for tweet in tweets_dict:
+            if tweet["tweet_id"] == id:
+                tweets_dict.remove(tweet)
+                with open("tweets.json", "w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(tweets_dict))
+                return tweet
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tweet not found"
+        )
 
 ### Update a Tweet
 @app.put(
