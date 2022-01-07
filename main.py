@@ -129,7 +129,6 @@ def login(user: UserLogin = Body(...)):
             detail="Wrong email or password"
         )
 
-
 ### Show all Users
 @app.get(
     path="/users",
@@ -193,13 +192,39 @@ def show_a_user(id: UUID):
 ### Delete a User
 @app.delete(
     path="/users/{user_id}/delete",
-    response_model=User,
+    #response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Delete a User",
     tags=["Users"]
 )
-def delete_a_user():
-    pass
+def delete_a_user(id: UUID):
+    """
+    Delete a user
+
+    This path operation delete a user using his id
+
+    **Parameters**
+    - Resquest body parameters:
+        - id: UUID
+
+    Returns information about the deleted user
+    """
+    id = str(id)
+    with open("users.json", "r", encoding="utf-8") as f:
+        users_dict = json.loads(f.read())
+        
+        for user in users_dict:
+            if user["user_id"] == id:
+                users_dict.remove(user)
+                with open("users.json", "w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(users_dict))
+                return user
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="This user not exists"
+        )
 
 ### Update a User
 @app.put(
