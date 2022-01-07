@@ -8,7 +8,7 @@ import json
 from pydantic import BaseModel, EmailStr, Field
 
 # Fast API
-from fastapi import FastAPI, status, Body
+from fastapi import FastAPI, status, Body, HTTPException
 
 app = FastAPI()
 
@@ -101,7 +101,7 @@ def signup(user: UserRegister = Body(...)):
     summary="Login a User",
     tags=["Users"]
 )
-def login():
+def login(user: UserLogin = Body(...)):
     """
     Login
 
@@ -109,11 +109,25 @@ def login():
 
     Parameter:
     - Request body parameters:
-        - username: str
+        - email: str
         - password: str
 
     Returns to twitter's home
     """
+    user_dict = user.dict()
+
+    with open("users.json", "r", encoding="utf-8") as f:
+        users = json.loads(f.read())
+
+        for person in users:
+            if person["email"] == user_dict["email"]:
+                if person["password"] == user_dict["password"]:
+                    return person
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Wrong email or password"
+        )
+
 
 ### Show all Users
 @app.get(
