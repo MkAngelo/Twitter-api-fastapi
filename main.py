@@ -8,7 +8,7 @@ import json
 from pydantic import BaseModel, EmailStr, Field
 
 # Fast API
-from fastapi import FastAPI, status, Body, HTTPException
+from fastapi import FastAPI, status, Body, HTTPException, Form, Path
 
 app = FastAPI()
 
@@ -157,14 +157,14 @@ def show_all_users():
         return results
 
 ### Show a User
-@app.post(
+@app.get(
     path="/users/{user_id}",
     response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Show a User",
     tags=["Users"]
 )
-def show_a_user(user: UserBase = Body(...)):
+def show_a_user(id: UUID):
     """
     Show a User
 
@@ -172,17 +172,17 @@ def show_a_user(user: UserBase = Body(...)):
 
     Parameters:
     - Request body parameters:
-        - email: Emailstr
+        - id: UUID
     
     Returns information about the user
     """
-    user_dict = user.dict()
+    id = str(id)
     
     with open("users.json", "r", encoding="utf-8") as f:
         users = json.loads(f.read())
 
         for us in users:
-            if us["email"] == user_dict["email"]:
+            if us["user_id"] == id:
                 return us
         
         raise HTTPException(
