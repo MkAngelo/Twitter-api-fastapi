@@ -102,7 +102,18 @@ def signup(user: UserRegister = Body(...)):
     tags=["Users"]
 )
 def login():
-    pass
+    """
+    Login
+
+    This path operation allows access to Twitter
+
+    Parameter:
+    - Request body parameters:
+        - username: str
+        - password: str
+
+    Returns to twitter's home
+    """
 
 ### Show all Users
 @app.get(
