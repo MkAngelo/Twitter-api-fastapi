@@ -366,7 +366,7 @@ def show_a_tweet(id: UUID):
         
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tweet not found"
+            detail="Tweet not found :("
         )
 
 ### Delete a Tweet
