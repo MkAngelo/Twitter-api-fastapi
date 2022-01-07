@@ -414,5 +414,38 @@ def delete_a_tweet(id: UUID):
     summary="Update a Tweet",
     tags=["Tweets"]
 )
-def update_a_tweet():
-    pass
+def update_a_tweet(tweet: Tweet = Body(...)):
+    """
+    Update Tweet
+
+    This path request update a tweet
+
+    **Parameters**
+    - Request body parameters
+        - tweet: Tweet
+    
+    Return tweet updated
+    """
+    
+    tweet_dict = tweet.dict()
+    tweet_dict["tweet_id"] = str(tweet_dict["tweet_id"])
+    tweet_dict["created_at"] = str(tweet_dict["created_at"])
+    tweet_dict["updated_at"] = str(tweet_dict["updated_at"])
+    tweet_dict["by"]["user_id"] = str(tweet_dict["by"]["user_id"])
+    tweet_dict["by"]["birth_date"] = str(tweet_dict["by"]["birth_date"])
+
+    with open("tweets.json", "r", encoding="utf-8") as f:
+        tweets_dict = json.loads(f.read())
+
+        for tw in tweets_dict:
+            if tw["tweet_id"] == tweet_dict["tweet_id"]:
+                tweets_dict[tweets_dict.index(tw)] = tweet_dict
+                with open("tweets.json", "w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(tweets_dict))
+                return tweet_dict
+        
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail="Tweet not found"
+        )
