@@ -192,7 +192,7 @@ def show_a_user(id: UUID):
 ### Delete a User
 @app.delete(
     path="/users/{user_id}/delete",
-    #response_model=User,
+    response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Delete a User",
     tags=["Users"]
@@ -234,8 +234,38 @@ def delete_a_user(id: UUID):
     summary="Update a User",
     tags=["Users"]
 )
-def update_a_user():
-    pass
+def update_a_user(user: User = Body(...)):
+    """
+    Update User
+
+    This path operation update the information about a user
+
+    **Parameters**
+    - Request body parameters: 
+        - user: User
+    
+    Return the user's information updated
+    """
+    user_dict = user.dict()
+    
+    user_dict["user_id"] = str(user_dict["user_id"])
+    user_dict["birth_date"] = str(user_dict["birth_date"])
+
+    with open("users.json", "r", encoding="utf-8") as f:
+        users_dict = json.loads(f.read())
+
+        for user in users_dict:
+            if user['user_id'] == user_dict["user_id"]:
+                users_dict[users_dict.index(user)] = user_dict
+                with open("users.json", "w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(users_dict))
+                    return user_dict
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="This user not exists"
+        )
 
 ## Tweets
 
