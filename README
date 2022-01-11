@@ -1,0 +1,14 @@
+# TWITTER API 
+
+This is an API inspired by Twitter, have the basic functions of Twitter, like:
+- Sign up
+- Login
+- Update profile
+- Post a tweet
+- Show all tweets
+- Show a tweet
+- Delete a tweet
+
+And add a new function:
+
+- Modify a tweet
